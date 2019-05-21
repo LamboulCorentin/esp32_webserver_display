@@ -8,17 +8,6 @@ const char MAIN_page[] PROGMEM = R"=====(
 </head>
 
 <style>
-.card{
-    max-width: 400px;
-     min-height: 50px;
-     background: #02b875;
-     padding: 30px;
-     box-sizing: border-box;
-     color: #FFF;
-     margin:20px;
-     box-shadow: 0px 2px 18px -4px rgba(0,0,0,0.75);
-}
-
 .bloc-graph{
   position:fixed;
   border: solid 1px;
@@ -28,7 +17,6 @@ const char MAIN_page[] PROGMEM = R"=====(
   bottom: 200px;
   right:10px;
 }
-
 </style>
 <body>
 
@@ -36,14 +24,6 @@ const char MAIN_page[] PROGMEM = R"=====(
   <input type="button" value="ON">
 </form>
 <p>OFF</p>
-
-<div class="card">
-  <h1>Sensor Value:<span id="ADCValue">0</span></h1><br>
-</div>
-
-<div class="card">
-  <h1>Stop Value:<span id="stopValue">4096</span></h1><br>
-</div>
 
 <div class="bloc-graph">
   <h1>Chart.js</h1>
@@ -96,9 +76,7 @@ const char MAIN_page[] PROGMEM = R"=====(
 
 /* ************************************************************** */
 /* ************************************************************** */
-setInterval(function() {
-  mainFunction();
-}, 100);      
+setInterval(mainFunction(), 1000);      
 /* ************************************************************** */
 /* ************************************************************** */
 var dat;
@@ -106,11 +84,10 @@ var dat;
 function mainFunction() {
   if (btn.value === 'OFF') {
     getData();
-    ajouterLigne();
     if (document.getElementById("tableau").rows.length >6){
       supprimerLigne();
     }
-    if(chart.data.labels.length >500){
+    if(chart.data.labels.length >50){
       removeData(chart);
     }
   } 
@@ -128,11 +105,9 @@ function updateBtn() {
   if (btn.value === 'ON') {
     btn.value = 'OFF';
     txt.textContent = 'BEGIN !';
-    StartADC();
   } else {
     btn.value = 'ON';
     txt.textContent = 'END';
-    StopADC();
     document.getElementById("ADCValue").innerHTML = 0;
   }
 }
@@ -143,10 +118,9 @@ function getData() {
     var xhttp = new XMLHttpRequest();
     xhttp.onreadystatechange = function() {
       if (this.readyState == 4 && this.status == 200) {
-        /*document.getElementById("ADCValue").innerHTML = */
-        dat = 
-        this.responseText;
-     }
+      	dat = this.responseText;
+	ajouterLigne();
+     	}
     };
     xhttp.open("GET", "readADC", true);
     xhttp.timeout = 1000;
@@ -161,8 +135,7 @@ function ajouterLigne()
 	var tableau = document.getElementById("tableau");
 	var ligne = tableau.insertRow(-1);                                          //on a ajoute une ligne
 	var colonne1 = ligne.insertCell(0);                                         //on a une ajoute une cellule
-	/*colonne1.innerHTML += document.getElementById("ADCValue").innerHTML;*/
-  colonne1.innerHTML += dat;
+ 	colonne1.innerHTML += dat;
   
 	var date = new Date();
 	var colonne2 = ligne.insertCell(1);
@@ -174,7 +147,7 @@ function ajouterLigne()
 	var colonne4 = ligne.insertCell(3);
 	colonne4.innerHTML += date.getMilliseconds();
 
-  addData(chart, colonne4.innerHTML, colonne1.innerHTML);
+  	addData(chart, colonne4.innerHTML, colonne1.innerHTML);
 
 }
 
